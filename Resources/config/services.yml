@@ -1,0 +1,15 @@
+parameters:
+    os_tools.os_helper.class: OS\ToolsBundle\Helper\OSHelper
+
+services:
+    os.templating.helper:
+        class: %os_tools.os_helper.class%
+        tags:
+            - { name: templating.helper, alias: os }
+        arguments: ["@service_container"]
+
+    os.twig.extension:
+        class: OS\ToolsBundle\Extension\OSExtension
+        tags:
+            - { name: twig.extension }
+        arguments: ["@service_container"]
