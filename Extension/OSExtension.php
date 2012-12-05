@@ -3,7 +3,7 @@
 namespace OS\ToolsBundle\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use OS\CoreBundle\Helper\OSHelper;
+use OS\ToolsBundle\Helper\OSHelper;
 
 /**
  * @author ouardisoft

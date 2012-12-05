@@ -30,7 +30,7 @@ class BaseController extends ContainerAware
      * @param string|array $name
      * @param mixed $value
      * 
-     * @return \OS\CoreBundle\Controller\BaseController
+     * @return \OS\ToolsBundle\Controller\BaseController
      * 
      * @throws UnexpectedTypeException
      */
