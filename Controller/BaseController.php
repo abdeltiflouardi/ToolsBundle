@@ -90,6 +90,14 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * @return Response The renderer view
+     */
+    public function renderTextView($text)
+    {
+        return new Response($text);
+    }
+
+    /**
      * @return Response A Response instance
      */
     public function render($view, array $parameters = array(), Response $response = null)

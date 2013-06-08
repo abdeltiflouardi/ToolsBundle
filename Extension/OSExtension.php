@@ -55,7 +55,18 @@ class OSExtension extends \Twig_Extension
         return array(
             'rtrans' => new \Twig_Filter_Method($this, 'rtrans'),
             'param' => new \Twig_Filter_Method($this, 'param'),
+            'time_ago' => new \Twig_Filter_Method($this, 'getTimeAgo'),
         );
+    }
+
+    /**
+     * 
+     * @param \DateTime $date
+     * @param boolean $displayInterval
+     */
+    public function getTimeAgo($date, $displayInterval = true)
+    {
+        return $this->os->getTimeAgo($date, $displayInterval);
     }
 
     /**

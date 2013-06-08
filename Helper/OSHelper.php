@@ -18,12 +18,62 @@ class OSHelper extends Helper
     private $container;
     private $request;
     private $templating;
+    private $translator;
 
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
         $this->request = $container->get('request');
         $this->templating = $container->get('twig');
+        $this->translator = $container->get('translator');
+    }
+
+    /**
+     * Time ago
+     */
+    public function getTimeAgo($date, $displayInterval = true)
+    {
+        if (!$date instanceof \DateTime) {
+            return;
+        }
+
+        $str = "";
+        $now = new \DateTime();
+        $interval = $now->diff($date);
+
+        $invert = $interval->format('%R');
+        if ($interval->y >= 1) {
+            $str = static::pluralize($interval->y, $this->translator->trans('Year'));
+        } elseif ($interval->m >= 1) {
+            $str = static::pluralize($interval->m, $this->translator->trans('Month'));
+        } elseif ($interval->d >= 1) {
+            $str = static::pluralize($interval->d, $this->translator->trans('Day'));
+        } elseif ($interval->h >= 1) {
+            $str = static::pluralize($interval->h, $this->translator->trans('Hour'));
+        } elseif ($interval->i >= 1) {
+            $str = static::pluralize($interval->i, $this->translator->trans('Minute'));
+        } elseif ($interval->s >= 1) {
+            $str = static::pluralize($interval->s, $this->translator->trans('Second'));
+        }
+
+        if ($displayInterval) {
+            $str = $invert . $str;
+        }
+
+        return $str;
+    }
+
+    /**
+     *
+     * @param int $count
+     * @param string $text
+     * @return string 
+     */
+    public static function pluralize($count, $text)
+    {
+        $str = (substr($text, -1) == 's' || $count == 1) ? $text : "${text}s";
+
+        return sprintf("%s %s", $count, $str);
     }
 
     /**
