@@ -7,5 +7,4 @@ namespace OS\ToolsBundle\Util;
  */
 class Utils
 {
-    
 }

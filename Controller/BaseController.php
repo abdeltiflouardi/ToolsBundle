@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\Request;
 use OS\ToolsBundle\Exception\UnexpectedTypeException;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
+use Doctrine\ORM\Query;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -34,7 +37,7 @@ class BaseController extends ContainerAware
      * 
      * @throws UnexpectedTypeException
      */
-    public function set($name, $value = "") 
+    public function set($name, $value = "")
     {
         if (!is_string($name) && !is_array($name)) {
             throw new UnexpectedTypeException($name, 'string or array');
@@ -246,7 +249,7 @@ class BaseController extends ContainerAware
      */
     public function getRepository($entityName = null, $useDefault = true)
     {
-        if (!is_string($entityName))  {
+        if (!is_string($entityName)) {
             throw new UnexpectedTypeException($entityName, 'string');
         }
 
@@ -265,10 +268,66 @@ class BaseController extends ContainerAware
      */
     public function getParameter($name)
     {
-        if (!is_string($name))  {
+        if (!is_string($name)) {
             throw new UnexpectedTypeException($name, 'string');
         }
 
         return $this->container->getParameter($name);
+    }
+
+    /**
+     * @return Pagerfanta $pagerfanta
+     */
+    public function pager($entity, $options = null)
+    {
+        // Get Query from controller
+        if ($entity instanceof Query) {
+            $query = $entity;
+        } else {
+            $query = $em->createQuery($options['query']);
+        }
+
+        // ODER BY
+        $dql       = $query->getDQL();
+        $sort      = $this->getRequest()->query->get('sort');
+        $direction = $this->getRequest()->query->get('direction');
+
+        if ($sort) {
+            if (strpos($dql, 'ORDER BY') > 0) {
+                $dql .= sprintf(" ,%s %s", $sort, $direction);
+            } else {
+                $dql .= sprintf(" ORDER BY %s %s", $sort, $direction);
+            }
+        } elseif (isset($options['order_by'])) {
+            if (strpos($dql, 'ORDER BY') > 0) {
+                $dql .= " , " . $options['order_by'];
+            } else {
+                $dql .= " ORDER BY  " . $options['order_by'];
+            }
+        }
+        $query->setDQL($dql);
+
+        // Bind query to Pagerfanta
+        $adapter    = new DoctrineORMAdapter($query);
+        $pagerfanta = new Pagerfanta($adapter);
+
+        // current page
+        $pagerfanta->setCurrentPage($this->getRequest()->query->get('page', 1), true);
+
+        // Get items per page
+        if ($perPage = $this->getRequest()->query->get('per-page')) {
+            $itemsPerPage = $perPage;
+        } elseif (isset($options['itemsPerPage'])) {
+            $itemsPerPage = $options['itemsPerPage'];
+        } elseif ($this->container->hasParameter('items_per_page')) {
+            $itemsPerPage = $this->container->getParameter('items_per_page');
+        } else {
+            $itemsPerPage = 20;
+        }
+
+        $pagerfanta->setMaxPerPage($itemsPerPage);
+
+        // return pagerfanta object
+        return $pagerfanta;
     }
 }
