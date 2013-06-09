@@ -11,6 +11,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use OS\ToolsBundle\Exception\UnexpectedTypeException;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -92,9 +93,17 @@ class BaseController extends ContainerAware
     /**
      * @return Response The renderer view
      */
-    public function renderTextView($text)
+    public function renderText($text)
     {
         return new Response($text);
+    }
+
+    /**
+     * @return Response The renderer view
+     */
+    public function renderJson($text)
+    {
+        return new JsonResponse($text);
     }
 
     /**
