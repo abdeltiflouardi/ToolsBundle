@@ -2,16 +2,19 @@
 
 namespace OS\ToolsBundle\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use OS\ToolsBundle\Exception\UnexpectedTypeException;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
@@ -22,7 +25,7 @@ use Doctrine\ORM\Query;
  *
  * It provides methods to common features needed in controllers.
  *
- * @author ouardisoft
+ * @author Fabien Potencier <fabien@symfony.com>, ouardisoft
  */
 class BaseController extends ContainerAware
 {
@@ -54,27 +57,44 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * 
-     * @param string $route
-     * @param array $parameters
-     * @param boolean $absolute
-     * @return string
+     * Generates a URL from the given parameters.
+     *
+     * @param string         $route         The name of the route
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
+     *
+     * @see UrlGeneratorInterface
      */
-    public function generateUrl($route, $parameters = array(), $absolute = false)
+    public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-        return $this->container->get('router')->generate($route, $parameters, $absolute);
+        return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
 
     /**
-     * @param string like BlogBundle:Post:index
-     * @return Response
+     * Forwards the request to another controller.
+     *
+     * @param string $controller The controller name (a string like BlogBundle:Post:index)
+     * @param array  $path       An array of path parameters
+     * @param array  $query      An array of query parameters
+     *
+     * @return Response A Response instance
      */
     public function forward($controller, array $path = array(), array $query = array())
     {
-        return $this->container->get('http_kernel')->forward($controller, $path, $query);
+        $path['_controller'] = $controller;
+        $subRequest = $this->container->get('request')->duplicate($query, null, $path);
+
+        return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
+     * Returns a RedirectResponse to the given URL.
+     *
+     * @param string  $url    The URL to redirect to
+     * @param integer $status The status code to use for the Response
+     *
      * @return RedirectResponse
      */
     public function redirect($url, $status = 302)
@@ -83,7 +103,12 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * @return string The renderer view
+     * Returns a rendered view.
+     *
+     * @param string $view       The view name
+     * @param array  $parameters An array of parameters to pass to the view
+     *
+     * @return string The rendered view
      */
     public function renderView($view, array $parameters = array())
     {
@@ -107,6 +132,12 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Renders a view.
+     *
+     * @param string   $view       The view name
+     * @param array    $parameters An array of parameters to pass to the view
+     * @param Response $response   A response instance
+     *
      * @return Response A Response instance
      */
     public function render($view, array $parameters = array(), Response $response = null)
@@ -117,12 +148,18 @@ class BaseController extends ContainerAware
     /**
      * @return Response A Response instance
      */
-    public function view($view)
+    public function renderResponse($view)
     {
         return $this->container->get('templating')->renderResponse($view, $this->getViewData());
     }
 
     /**
+     * Streams a view.
+     *
+     * @param string           $view       The view name
+     * @param array            $parameters An array of parameters to pass to the view
+     * @param StreamedResponse $response   A response instance
+     *
      * @return StreamedResponse A StreamedResponse instance
      */
     public function stream($view, array $parameters = array(), StreamedResponse $response = null)
@@ -143,6 +180,15 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Returns a NotFoundHttpException.
+     *
+     * This will result in a 404 response code. Usage example:
+     *
+     *     throw $this->createNotFoundException('Page not found!');
+     *
+     * @param string    $message  A message
+     * @param \Exception $previous The previous exception
+     *
      * @return NotFoundHttpException
      */
     public function createNotFoundException($message = 'Not Found', \Exception $previous = null)
@@ -151,6 +197,12 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Creates and returns a Form instance from the type of the form.
+     *
+     * @param string|FormTypeInterface $type    The built type of the form
+     * @param mixed                    $data    The initial data for the form
+     * @param array                    $options Options for the form
+     *
      * @return Form
      */
     public function createForm($type, $data = null, array $options = array())
@@ -159,6 +211,11 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Creates and returns a form builder instance
+     *
+     * @param mixed $data    The initial data for the form
+     * @param array $options Options for the form
+     *
      * @return FormBuilder
      */
     public function createFormBuilder($data = null, array $options = array())
@@ -167,6 +224,8 @@ class BaseController extends ContainerAware
     }
 
     /**
+     * Shortcut to return the request service.
+     *
      * @return Request
      */
     public function getRequest()
