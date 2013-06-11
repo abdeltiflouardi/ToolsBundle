@@ -2,6 +2,9 @@
 
 namespace OS\ToolsBundle\Exception;
 
+/**
+ * @author ouardisoft
+ */
 class UnexpectedTypeException extends \RuntimeException
 {
 
