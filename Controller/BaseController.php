@@ -406,4 +406,23 @@ class BaseController extends ContainerAware
         // return pagerfanta object
         return $pagerfanta;
     }
+
+    /**
+     *
+     * @param string $route
+     * @return RedirectResponse $object
+     */
+    public function redirectTo($route, array $params = array(), $absolute = false)
+    {
+        $code = isset($params['code']) ? $params['code'] : 302;
+        unset($params['code']);
+
+        if (is_array($route) && isset($route['url'])) {
+            $url = $route['url'];
+        } else {
+            $url = $this->generateUrl($route, $params, $absolute);
+        }
+
+        return new RedirectResponse($url, $code);
+    }
 }
