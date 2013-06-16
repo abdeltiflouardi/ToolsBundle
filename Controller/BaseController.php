@@ -425,4 +425,27 @@ class BaseController extends ContainerAware
 
         return new RedirectResponse($url, $code);
     }
+
+    /**
+     *
+     * @return string url
+     */
+    public function referer()
+    {
+        return $this->getRequest()->headers->get('Referer');
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    public function redirectToReferer($router = '_post', $status = 302)
+    {
+        $referer = $this->referer();
+
+        $url = is_null($referer)
+                ? !is_null($router) ? $this->generateUrl($router) : $this->generateUrl('_post')
+                : $referer;
+
+        return $this->redirect($url, $status);
+    }
 }
