@@ -164,6 +164,43 @@ class OSHelper extends Helper
         return call_user_func_array($name, $arguments);
     }
 
+    public function stripHtmlTags($text, $tags, $useDefaults = false)
+    {
+        $defaults = array(
+            // Remove invisible content
+            '@<head[^>]*?>.*?</head>@siu',
+            '@<style[^>]*?>.*?</style>@siu',
+            '@<script[^>]*?.*?</script>@siu',
+            '@<object[^>]*?.*?</object>@siu',
+            '@<embed[^>]*?.*?</embed>@siu',
+            '@<applet[^>]*?.*?</applet>@siu',
+            '@<noframes[^>]*?.*?</noframes>@siu',
+            '@<noscript[^>]*?.*?</noscript>@siu',
+            '@<noembed[^>]*?.*?</noembed>@siu',
+            '@<iframe[^>]*?.*?</iframe>@siu',
+            '@<frameset[^>]*?.*?</frameset>@siu',
+            '@<frame[^>]*?.*?</frame>@siu'
+        );
+
+        if ($useDefaults) {
+            $toRemove = $defaults;
+        } else {
+            $toRemove = array();
+        }
+
+        foreach ($tags as $tag) {
+            $toRemove[] = sprintf('@<%1$s[^>]*?>.*?</%1$s>@siu', $tag);
+        }
+
+        $str = preg_replace(
+            $toRemove,
+            array_pad(array(), count($toRemove), ' '),
+            $text
+        );
+
+        return $str;
+    }
+
     public function getName()
     {
         return 'os_helper';

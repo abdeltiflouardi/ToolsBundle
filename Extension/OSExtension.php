@@ -56,6 +56,7 @@ class OSExtension extends \Twig_Extension
             'rtrans' => new \Twig_Filter_Method($this, 'rtrans'),
             'param' => new \Twig_Filter_Method($this, 'param'),
             'time_ago' => new \Twig_Filter_Method($this, 'getTimeAgo'),
+            'strip_html_tags' => new \Twig_Filter_Method($this, 'stripHtmlTags'),
         );
     }
 
@@ -90,6 +91,11 @@ class OSExtension extends \Twig_Extension
     public function rtrans($word, $domaine = 'messages', $locale = null)
     {
         return $this->os->rtrans($word, $domaine, $locale);
+    }
+
+    public function stripHtmlTags($text, array $tags = array(), $useDefaults = false)
+    {
+        return $this->os->stripHtmlTags($text, $tags, $useDefaults);
     }
 
     public function param($name, $default = null)
