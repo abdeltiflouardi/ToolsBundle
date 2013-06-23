@@ -448,4 +448,13 @@ class BaseController extends ContainerAware
 
         return $this->redirect($url, $status);
     }
+
+    /**
+     * 
+     * @return Boolean
+     */
+    public function isGranted($attributes, $object = null)
+    {
+        return $this->get('security.context')->isGranted($attributes, $object);
+    }
 }
