@@ -457,4 +457,50 @@ class BaseController extends ContainerAware
     {
         return $this->get('security.context')->isGranted($attributes, $object);
     }
+
+    /**
+     *
+     * @param string $key
+     * @return string 
+     */
+    public function trans($key, $locale = null, $domain = 'messages')
+    {
+        return $this->get('translator')->trans($key, array(), $domain, $locale);
+    }
+
+    /**
+     *
+     * @param string $message
+     * @param string $type 
+     */
+    public function flash($message, $type = 'success')
+    {
+        $this->getSession()->getFlashBag()->add($type, $this->trans($message));
+    }
+
+    /**
+     *
+     * @param string $name
+     * @param mixed $val 
+     */
+    public function setSession($name, $val)
+    {
+        $session = $this->getSession();
+
+        // store an attribute for reuse during a later user request
+        $session->set($name, $val);
+    }
+
+    /**
+     *
+     * @param string $name
+     * @return mixed 
+     */
+    public function getSession($name = null)
+    {
+        $session = $this->getRequest()->getSession();
+
+        // read session
+        return !empty($name) ? $session->get($name) : $session;
+    }
 }
