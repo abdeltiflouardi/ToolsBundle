@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use OS\ToolsBundle\Exception\UnexpectedTypeException;
 use Pagerfanta\Pagerfanta;
-use OS\ToolsBundle\OSORMAdapter;
+use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Doctrine\ORM\Query;
 
 /**
@@ -384,7 +384,7 @@ class BaseController extends ContainerAware
         $query->setDQL($dql);
 
         // Bind query to Pagerfanta
-        $adapter    = new OSORMAdapter($query);
+        $adapter    = new DoctrineORMAdapter($query);
         $pagerfanta = new Pagerfanta($adapter);
 
         // current page
