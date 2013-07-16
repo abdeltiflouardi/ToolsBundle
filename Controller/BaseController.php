@@ -19,6 +19,7 @@ use OS\ToolsBundle\Exception\UnexpectedTypeException;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Doctrine\ORM\Query;
+use OS\ToolsBundle\Util\String;
 
 /**
  * Controller is a simple implementation of a Controller.
@@ -148,9 +149,26 @@ class BaseController extends ContainerAware
     /**
      * @return Response A Response instance
      */
-    public function renderResponse($view)
+    public function renderResponse($view = null)
     {
+        if (null === $view) {
+            $view = String::getTemplateNameFromClass($this->getRequest()->attributes->get('_controller'));
+        }
+
         return $this->container->get('templating')->renderResponse($view, $this->getViewData());
+    }
+
+    /**
+     * @return Response A Response instance
+     */
+    public function renderResponseCache($view = null)
+    {
+        $response = $this->renderResponse($view);
+        $response->setETag(md5($response->getContent()));
+        $response->setPublic(); // make sure the response is public/cacheable
+        $response->isNotModified($this->getRequest());
+
+        return $response;
     }
 
     /**

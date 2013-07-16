@@ -8,6 +8,18 @@ namespace OS\ToolsBundle\Util;
 class String
 {
     /**
+     * 
+     */
+    public static function getTemplateNameFromClass($className)
+    {
+        return preg_filter(
+            '/(.*)\\\(.*)\\\Controller\\\(.*)Controller::(.*)Action/',
+            '$1$2:$3:$4.html.twig',
+            $className
+        );
+    }
+
+    /**
      * Truncate
      */
     public static function truncate($value, $length = 30, $preserve = false, $separator = '...')
