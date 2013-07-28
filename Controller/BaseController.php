@@ -149,26 +149,52 @@ class BaseController extends ContainerAware
     /**
      * @return Response A Response instance
      */
-    public function renderResponse($view = null)
+    public function renderResponse($view = null, Response $response = null)
     {
         if (null === $view) {
             $view = String::getTemplateNameFromClass($this->getRequest()->attributes->get('_controller'));
         }
 
-        return $this->container->get('templating')->renderResponse($view, $this->getViewData());
+        return $this->container->get('templating')->renderResponse($view, $this->getViewData(), $response);
     }
 
     /**
      * @return Response A Response instance
      */
-    public function renderResponseCache($view = null)
+    public function renderResponseCache($view = null, $lastModified = null)
     {
-        $response = $this->renderResponse($view);
-        $response->setETag(md5($response->getContent()));
-        $response->setPublic(); // make sure the response is public/cacheable
-        $response->isNotModified($this->getRequest());
+        $r = $this->getRequest();
 
-        return $response;
+        if ($etag = $this->getViewData('_etag')) {
+            $prepareEtag = $etag;
+        } else {
+            $prepareEtag = sprintf(
+                '%s %s %s %s %s %s',
+                $r->getMethod(),
+                $r->getRequestUri(),
+                $r->server->get('SERVER_PROTOCOL'),
+                $this->getParameter('version'),
+                $this->getParameter('kernel.environment'),
+                $lastModified instanceof \DateTime ? $lastModified->format('YmdHis') : ''
+            );
+        }
+
+        $response = new Response();
+        $response->setETag(md5(serialize($prepareEtag)));
+        $response->setPublic(); // make sure the response is public/cacheable
+        $response->setMaxAge(1800);
+        $response->setSharedMaxAge(1800);
+
+        //$lastModified = new \DateTime('2013-07-20 16:54:30');
+        if ($lastModified instanceof \DateTime) {
+            $response->setLastModified($lastModified);
+        }
+
+        if ($response->isNotModified($r)) {
+            return $response;
+        }
+
+        return $this->renderResponse($view, $response);
     }
 
     /**

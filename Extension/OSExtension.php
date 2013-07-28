@@ -78,14 +78,20 @@ class OSExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'param'        => new \Twig_Function_Method($this, 'param'),
-            'pager_pagination'     => new \Twig_Function_Method($this, 'pagerPagination'),
+            'param' => new \Twig_Function_Method($this, 'param'),
+            'is_route' => new \Twig_Function_Method($this, 'isRoute'),
+            'pager_pagination' => new \Twig_Function_Method($this, 'pagerPagination'),
          );
     }
 
     public function pagerPagination($page, $template, $options = array())
     {
         return $this->os->pagerPagination($page, $template, $options);
+    }
+
+    public function isRoute($route)
+    {
+        return $this->os->isRoute($route);
     }
 
     public function rtrans($word, $domaine = 'messages', $locale = null)

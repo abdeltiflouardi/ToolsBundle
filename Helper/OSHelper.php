@@ -159,6 +159,11 @@ class OSHelper extends Helper
         return array_search($word, $messages[$domaine]);
     }
 
+    public function isRoute($route)
+    {
+        return $route == $this->container->get('request')->attributes->get('_route');
+    }
+
     public function __call($name, $arguments)
     {
         return call_user_func_array($name, $arguments);
