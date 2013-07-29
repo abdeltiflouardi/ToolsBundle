@@ -89,9 +89,9 @@ class OSExtension extends \Twig_Extension
         return $this->os->pagerPagination($page, $template, $options);
     }
 
-    public function isRoute($route)
+    public function isRoute($route, $isStartWith = false)
     {
-        return $this->os->isRoute($route);
+        return $this->os->isRoute($route, $isStartWith);
     }
 
     public function rtrans($word, $domaine = 'messages', $locale = null)

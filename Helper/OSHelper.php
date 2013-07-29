@@ -159,9 +159,14 @@ class OSHelper extends Helper
         return array_search($word, $messages[$domaine]);
     }
 
-    public function isRoute($route)
+    public function isRoute($route, $isStartWith = false)
     {
-        return $route == $this->container->get('request')->attributes->get('_route');
+        $currRoute = $this->container->get('request')->attributes->get('_route');
+        if ($isStartWith && preg_match('/^' . $route . '/', $currRoute)) {
+            return true;
+        }
+
+        return $route == $currRoute;
     }
 
     public function __call($name, $arguments)
