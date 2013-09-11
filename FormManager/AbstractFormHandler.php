@@ -8,7 +8,7 @@ namespace OS\ToolsBundle\FormManager;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Form;
-use OS\CommonBundle\EntityManager\AbstractEntityManager;
+use OS\ToolsBundle\EntityManager\AbstractEntityManager;
 use OS\ToolsBundle\Provider\AbstractProvider;
 
 /**
