@@ -6,6 +6,8 @@
  */
 namespace OS\ToolsBundle\FormManager;
 
+use OS\ToolsBundle\Util\Object;
+
 /**
  * Description of AbstractFormModel
  *
@@ -54,6 +56,11 @@ abstract class AbstractFormModel
      */
     public function getEntity()
     {
+        $o = new Object();
+        $o->setFrom($this);
+        $o->setTo($this->entity);
+        $o->copy();
+
         return $this->entity;
     }
 
@@ -75,5 +82,20 @@ abstract class AbstractFormModel
     public function createInstance()
     {
         return new static($this->getName(), $this->getEntityName());
+    }
+
+    /**
+     * 
+     * @param object $entity
+     * @return object
+     */
+    public function modelFromEntity($entity)
+    {
+        $o = new Object();
+        $o->setFrom($entity);
+        $o->setTo($this);
+        $o->copy();
+
+        return $this;
     }
 }

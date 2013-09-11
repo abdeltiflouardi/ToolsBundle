@@ -48,9 +48,15 @@ abstract class AbstractFormHandler
      * @param \OS\CommonBundle\FormManager\Form $form
      * @return boolean|object
      */
-    public function process(Form $form, array $options = array())
+    public function process(Form $form, array $options = array(), $data = null)
     {
         if (!$this->request->isMethod('POST')) {
+            if ($data) {
+                $model = $form->getData();
+                $model->modelFromEntity($data);
+                $form->setData($model);
+            }
+
             return false;
         }
 
