@@ -63,7 +63,15 @@ abstract class AbstractFormHandler
         $form->bind($this->request);
 
         if ($form->isValid()) {
-            return $this->processValidForm($form, $options);
+            $model = $form->getData();
+
+            if ($data) {
+                $model->setEntity($data);
+            }
+
+            $entity = $model->getEntity();
+
+            return $this->processValidForm($form, $options, $entity);
         }
 
         return false;
@@ -74,5 +82,5 @@ abstract class AbstractFormHandler
      * @param \Symfony\Component\Form\Form $form
      * @param array $options
      */
-    abstract protected function processValidForm(Form $form, array $options);
+    abstract protected function processValidForm(Form $form, array $options, $data);
 }
