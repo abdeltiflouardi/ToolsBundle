@@ -185,7 +185,6 @@ class Controller extends ContainerAware
         $response->setMaxAge(604800);
         $response->setSharedMaxAge(604800);
 
-        //$lastModified = new \DateTime('2013-07-20 16:54:30');
         if ($lastModified instanceof \DateTime) {
             $response->setLastModified($lastModified);
         }
