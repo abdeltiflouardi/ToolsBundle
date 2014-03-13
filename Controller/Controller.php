@@ -28,7 +28,7 @@ use OS\ToolsBundle\Util\String;
  *
  * @author Fabien Potencier <fabien@symfony.com>, ouardisoft
  */
-class BaseController extends ContainerAware
+class Controller extends ContainerAware
 {
 
     protected $viewData = array();
