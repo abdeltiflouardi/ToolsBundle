@@ -2,7 +2,7 @@
   "name": "os/tools-bundle",
   "description": "OS Tools Bundle for Symfony2",
   "keywords": ["tools"],
-  "homepage": "http://github.com/ouardisoft/ToolsBundle",
+  "homepage": "http://github.com/abdeltiflouardi/ToolsBundle",
   "type": "symfony-bundle",
   "license": "MIT",
   "authors": [
